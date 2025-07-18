@@ -4,9 +4,9 @@
   "description": "A system to automatically generate and upload developer onboarding docs to Firebase.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm run init:docs",
-    "init:docs": "node init-docs.js",
+    "start": "node index.js",
+    "setup:initial": "node init-docs.js",
+    "lint:md": "markdownlint-cli \"*.md\"",
     "prepare": "husky"
   },
   "keywords": [
@@ -23,6 +23,7 @@
     "firebase-admin": "^13.4.0"
   },
   "devDependencies": {
+    "glob": "^11.0.3",
     "husky": "^9.1.7",
     "markdown-it": "^14.1.0",
     "markdownlint-cli": "^0.41.0"

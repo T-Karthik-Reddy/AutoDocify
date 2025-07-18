@@ -1,13 +1,9 @@
+// ===== New init-docs.js =====
+
 const admin = require('firebase-admin');
 const fs = require('fs');
-const path = require('path');
 
-// =================================================================
-// 1. FIREBASE & DOCS CONFIGURATION
-// =================================================================
-
-// Initialize Firebase Admin SDK
-// NOTE: For a real project, use environment variables, not a committed key.
+// --- 1. Initialize Firebase Admin SDK ---
 const serviceAccount = require('./serviceAccountKey.json');
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
@@ -15,11 +11,15 @@ admin.initializeApp({
 const db = admin.firestore();
 console.log('Successfully connected to Firebase.');
 
-// --- Define the content for our documentation files ---
-const documents = [
-  {
-    filename: 'SETUP_GUIDE.md',
-    content: `
+// --- 2. Define the content for the main README file ---
+const readmeContent = `
+# AutoMarkDown Project
+
+This file provides the core onboarding documentation for this project.
+It is automatically updated with checklists when new files are added.
+
+---
+
 # Project Setup Guide
 
 ## Prerequisites
@@ -35,11 +35,9 @@ const documents = [
 ## Running the Project
 
 - To start the development server, run: \`npm start\`
-`
-  },
-  {
-    filename: 'CODING_STANDARDS.md',
-    content: `
+
+---
+
 # Coding Standards
 
 ## JavaScript
@@ -52,79 +50,40 @@ const documents = [
 
 - Use a single top-level heading (#).
 - Use subheadings (##, ###) to structure content.
-`
-  }
-];
 
-// =================================================================
-// 2. CORE LOGIC
-// =================================================================
+---
+<!-- AUTO-DOCS-START -->
+## Project Files
 
-/**
- * Generates local .md files from the documents configuration.
- */
-function generateLocalDocs() {
-  console.log('Generating local markdown files...');
-  try {
-    documents.forEach(doc => {
-      // We trim the content to remove any leading/trailing whitespace.
-      fs.writeFileSync(doc.filename, doc.content.trim() + '\n');
-      console.log(`- Created ${doc.filename}`);
-    });
-    console.log('Local documents generated successfully!');
-    return true;
-  } catch (error) {
-    console.error('Error generating local files:', error);
-    return false;
-  }
-}
+This list is automatically generated. Do not edit it manually.
+<!-- AUTO-DOCS-END -->
+`.trim() + '\n'; // Use trim() and add a single newline for correct formatting
 
 /**
- * Uploads the content of a single file to Firestore.
- * @param {string} filePath - The path to the file to upload.
+ * Main function to create the initial README and upload it.
  */
-async function uploadDocToFirestore(filePath) {
-  const fileName = path.basename(filePath, '.md');
-  const collectionName = 'onboarding-docs';
+async function initializeProjectReadme() {
+  console.log('--- Starting Project Initialization ---');
 
   try {
-    const fileContent = fs.readFileSync(filePath, 'utf8');
-    const docRef = db.collection(collectionName).doc(fileName);
-    
+    // --- Create the local README.md file ---
+    fs.writeFileSync('README.md', readmeContent);
+    console.log('✅ Successfully generated local README.md');
+
+    // --- Upload the initial README to Firestore ---
+    const docRef = db.collection('onboarding-docs').doc('README');
     await docRef.set({
-      content: fileContent,
+      content: readmeContent,
       lastUpdated: new Date()
     });
+    console.log('✅ Successfully uploaded initial README to Firestore.');
 
-    console.log(`- Uploaded '${fileName}' to Firestore.`);
   } catch (error) {
-    console.error(`Error uploading ${fileName}:`, error);
-  }
-}
-
-// =================================================================
-// 3. MAIN EXECUTION
-// =================================================================
-
-/**
- * Main function to run the entire process.
- */
-async function initializeProjectDocs() {
-  console.log('--- Starting Developer Docs Initialization ---');
-
-  // Step 1: Generate the local .md files
-  const success = generateLocalDocs();
-
-  // Step 2: If generation was successful, upload to Firebase
-  if (success) {
-    console.log('\nUploading documents to Firestore...');
-    const uploadPromises = documents.map(doc => uploadDocToFirestore(doc.filename));
-    await Promise.all(uploadPromises);
-    console.log('All documents processed.');
+    console.error('Failed to initialize project:', error);
   }
   
   console.log('\n--- Initialization Complete! ---');
 }
 
 // Run the main function
-initializeProjectDocs();
+initializeProjectReadme();
