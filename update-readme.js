@@ -10,8 +10,8 @@ const DOCS_END_MARKER = '<!-- AUTO-DOCS-END -->';
 
 async function main() {
   // Find all .js files in the 'src' directory (adjust if your code is elsewhere)
-  const files = await glob('src/**/*.js', {
-    ignore: 'node_modules/**',
+  const files = await glob('**/*.js', {
+    ignore: ['node_modules/**', 'init-docs.js', 'update-readme.js'],
   });
 
   // For each file, find its dependencies
