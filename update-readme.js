@@ -14,9 +14,27 @@ async function main() {
     ignore: 'node_modules/**',
   });
 
-  // Generate the markdown content for the file list
-  const fileListMarkdown = files
-    .map(file => `- \`${file}\``)
+  // For each file, find its dependencies
+  const fileDetails = await Promise.all(
+    files.map(async file => {
+      const content = fs.readFileSync(file, 'utf8');
+      // Regex to find non-relative imports/requires (e.g., 'firebase', not './firebase')
+      const dependencyRegex = /(?:require|from)\(['"]([^./][^'"]*)['"]/g;
+      const dependencies = new Set();
+      let match;
+      while ((match = dependencyRegex.exec(content)) !== null) {
+        dependencies.add(match[1]);
+      }
+      return { path: file, dependencies: Array.from(dependencies) };
+    })
+  );
+
+  // Generate the markdown content for the file and dependency list
+  const fileListMarkdown = fileDetails
+    .map(detail => {
+      const deps = detail.dependencies.map(d => `\`${d}\``).join(', ');
+      return `- \`${detail.path}\`${deps ? `\n  - **Dependencies**: ${deps}` : ''}`;
+    })
     .join('\n');
 
   const generatedContent = `
