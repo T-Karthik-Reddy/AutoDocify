@@ -8,8 +8,6 @@ This is the main description of my project.
 This list is automatically generated. Do not edit it manually.
 
 - `src/app.js`
-- `src/apitest.js`
-  - **Dependencies**: `fs`, `path`, `firebase-admin`
 <!-- AUTO-DOCS-END -->
 
 ## Manual Section
