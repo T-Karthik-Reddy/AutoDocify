@@ -7,6 +7,8 @@ This is the main description of my project.
 
 This list is automatically generated. Do not edit it manually.
 
+- `src/test34.js`
+  - **Dependencies**: `fs`, `path`, `firebase-admin`
 - `src/app.js`
 <!-- AUTO-DOCS-END -->
 
