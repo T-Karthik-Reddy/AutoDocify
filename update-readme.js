@@ -56,7 +56,6 @@ ${fileListMarkdown}
   }
 
 
-  // Replace the content between the markers
   const newReadmeContent = readmeContent.replace(
     new RegExp(`${DOCS_START_MARKER}[\\s\\S]*${DOCS_END_MARKER}`),
     `${DOCS_START_MARKER}\n${generatedContent}\n${DOCS_END_MARKER}`
